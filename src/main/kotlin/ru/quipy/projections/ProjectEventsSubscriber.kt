@@ -4,7 +4,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import ru.quipy.api.ProjectAggregate
+import ru.quipy.api.aggregates.ProjectAggregate
 import ru.quipy.api.TagAssignedToTaskEvent
 import ru.quipy.api.TagCreatedEvent
 import ru.quipy.api.TaskCreatedEvent
