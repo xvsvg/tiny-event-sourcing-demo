@@ -1,37 +1,46 @@
 ﻿package ru.quipy.logic.task
 
 import ru.quipy.api.TaskStatusCreatedEvent
-import ru.quipy.api.aggregates.TaskAggregate
+import ru.quipy.api.aggregates.TaskStatusAggregate
 import ru.quipy.core.annotations.StateTransitionFunc
 import ru.quipy.domain.AggregateState
 import java.util.*
 
-class TaskStatus(
-    private var id: UUID,
-    private var name: String,
-    private var projectId: UUID,
-    private var rColor: Int,
-    private var gColor: Int,
-    private var bColor: Int
-) : AggregateState<UUID, TaskAggregate> {
+class TaskStatus : AggregateState<UUID, TaskStatusAggregate> {
 
-    override fun getId() = id
+    lateinit var taskStatusId: UUID
+    lateinit var name: String
+    lateinit var projectId: UUID
+    var rColor: Int = 0
+    var gColor: Int = 0
+    var bColor: Int = 0
 
-    fun changeColor(rColor : Int, gColor : Int, bColor : Int) {
-        if (!(rColor >= 0 && gColor >= 0 && bColor >= 0)) {
-            throw IllegalArgumentException("Color value cannot be negative")
-        }
+    override fun getId() = taskStatusId
 
-        this.rColor = rColor
-        this.gColor = gColor
-        this.bColor = bColor
-    }
-
-    fun create(name: String, rColor: Int = 0, gColor: Int = 0, bColor: Int = 0): TaskStatusCreatedEvent {
+    fun create(name: String, projectId: UUID, rColor: Int = 0, gColor: Int = 0, bColor: Int = 0): TaskStatusCreatedEvent {
         if (name.isBlank()) {
             throw IllegalArgumentException("Status name should not be blank")
         }
 
-        return TaskStatusCreatedEvent(UUID.randomUUID(), name, getId(), rColor, gColor, bColor)
+        return TaskStatusCreatedEvent(UUID.randomUUID(), name, projectId, rColor, gColor, bColor)
+    }
+
+    @StateTransitionFunc
+    fun taskStatusCreatedApply(event: TaskStatusCreatedEvent) {
+        taskStatusId = event.taskStatusId
+        name = event.taskStatusName
+        projectId = event.projectId
+        rColor = event.rColor
+        gColor = event.gColor
+        bColor = event.bColor
     }
 }
+
+data class TaskStatusEntity(
+    var id: UUID,
+    var name: String,
+    var projectId: UUID,
+    var rColor: Int = 0,
+    var gColor: Int = 0,
+    var bColor: Int = 0
+)

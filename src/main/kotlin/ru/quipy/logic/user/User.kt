@@ -6,27 +6,32 @@ import ru.quipy.core.annotations.StateTransitionFunc
 import ru.quipy.domain.AggregateState
 import java.util.*
 
-class User(
-    private var id: UUID,
-    private var fullname: String,
-    private var nickname: String,
-    private var password: ByteArray?
-) : AggregateState<UUID, UserAggregate> {
+class User : AggregateState<UUID, UserAggregate> {
+    lateinit var userId: UUID
+    lateinit var fullname: String
+    lateinit var nickname: String
+    var password: ByteArray? = null
 
-    override fun getId() = id
+    override fun getId() = userId
 
     fun create(fullname: String, nickname: String, password: String): UserCreatedEvent {
         if (fullname.isEmpty() || nickname.isEmpty() || password.isEmpty())
             throw IllegalArgumentException("Fullname, nickname and password cannot be empty")
 
-        return UserCreatedEvent(fullname, nickname, password)
+        return UserCreatedEvent(UUID.randomUUID(), fullname, nickname, password)
     }
 
     @StateTransitionFunc
     fun userCreated(event: UserCreatedEvent) {
-        id = event.id
+        userId = event.userId
         fullname = event.fullname
         nickname = event.nickname
         password = event.password.encodeToByteArray()
     }
 }
+
+data class UserEntity(
+    var id: UUID,
+    var fullname: String,
+    var nickname: String
+)

@@ -1,13 +1,13 @@
 ﻿package ru.quipy.api
 
+import ru.quipy.api.aggregates.ProjectAggregate
 import ru.quipy.api.aggregates.TaskAggregate
 import ru.quipy.core.annotations.DomainEvent
 import ru.quipy.domain.Event
-import ru.quipy.logic.task.TaskStatus
+import ru.quipy.logic.task.TaskStatusEntity
 import java.util.*
 
 const val TASK_CREATED_EVENT = "TASK_CREATED_EVENT"
-const val TASK_STATUS_CREATED_EVENT = "TASK_STATUS_CREATED_EVENT"
 const val TASK_NAME_UPDATED_EVENT = "TASK_NAME_UPDATED_EVENT"
 const val EXECUTOR_ADDED_EVENT = "EXECUTOR_ADDED_EVENT"
 
@@ -16,30 +16,16 @@ data class TaskCreatedEvent(
     val taskId: UUID,
     val taskName: String,
     val description: String,
-    val status: TaskStatus,
+    val status: TaskStatusEntity?,
     val projectId: UUID
-) : Event<TaskAggregate>(
+) : Event<ProjectAggregate>(
     name = TASK_CREATED_EVENT,
     createdAt = System.currentTimeMillis()
 )
 
-@DomainEvent(name = TASK_STATUS_CREATED_EVENT)
-data class TaskStatusCreatedEvent(
-    val taskStatusId: UUID,
-    val taskStatusName: String,
-    val projectId: UUID,
-    val rColor : Int,
-    val bColor : Int,
-    val gColor : Int
-) : Event<TaskAggregate>(
-    name = TASK_STATUS_CREATED_EVENT,
-    createdAt = System.currentTimeMillis()
-)
-
 @DomainEvent(name = TASK_NAME_UPDATED_EVENT)
-data class TaskNameUpdatedEvent(
-    val taskId: UUID,
-    val taskName: String
+data class TaskStatusChangedEvent(
+    val status: TaskStatusEntity
 ) : Event<TaskAggregate>(
     name = TASK_NAME_UPDATED_EVENT,
     createdAt = System.currentTimeMillis()

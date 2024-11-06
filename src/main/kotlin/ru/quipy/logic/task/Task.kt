@@ -2,29 +2,28 @@
 
 import ru.quipy.api.ExecutorAddedEvent
 import ru.quipy.api.TaskCreatedEvent
-import ru.quipy.api.TaskNameUpdatedEvent
+import ru.quipy.api.TaskStatusChangedEvent
 import ru.quipy.api.aggregates.TaskAggregate
 import ru.quipy.core.annotations.StateTransitionFunc
 import ru.quipy.domain.AggregateState
 import java.util.*
 import kotlin.collections.HashSet
 
-class Task(
-    private  var id : UUID,
-    private  var name : String,
-    private  var description : String,
-    private  var status : TaskStatus,
-    private var projectId : UUID
-) : AggregateState<UUID, TaskAggregate> {
-    private var executors : List<UUID> = emptyList()
+class Task : AggregateState<UUID, TaskAggregate> {
+    lateinit var taskId: UUID
+    lateinit var name: String
+    lateinit var description: String
+    var status: TaskStatusEntity? = null
+    lateinit var projectId: UUID
+    var executors: List<UUID> = emptyList()
 
-    override fun getId() = id
+    override fun getId() = taskId
 
-    fun changeName(name : String): TaskNameUpdatedEvent {
-        return TaskNameUpdatedEvent(getId(), name)
+    fun changeStatus(status : TaskStatusEntity): TaskStatusChangedEvent {
+        return TaskStatusChangedEvent(status)
     }
 
-    fun assignExecutors(executors : Collection<UUID>): ExecutorAddedEvent {
+    fun assignExecutors(executors: Collection<UUID>): ExecutorAddedEvent {
         val uniqueExecutors = HashSet<UUID>()
         uniqueExecutors.addAll(executors)
         uniqueExecutors.addAll(this.executors)
@@ -33,8 +32,8 @@ class Task(
     }
 
     @StateTransitionFunc
-    fun taskCreatedApply(event : TaskCreatedEvent) {
-        id = event.taskId
+    fun taskCreatedApply(event: TaskCreatedEvent) {
+        taskId = event.taskId
         name = event.taskName
         description = event.description
         status = event.status
@@ -42,8 +41,8 @@ class Task(
     }
 
     @StateTransitionFunc
-    fun taskNameUpdatedApply(event : TaskNameUpdatedEvent) {
-        this.name = event.name
+    fun taskStatusChangedApply(event: TaskStatusChangedEvent) {
+        this.status = event.status
     }
 
     @StateTransitionFunc
@@ -51,3 +50,11 @@ class Task(
         this.executors = event.executors.toList()
     }
 }
+
+data class TaskEntity(
+    var id: UUID,
+    var name: String,
+    var description: String,
+    var status: TaskStatusEntity?,
+    var projectId: UUID
+)
