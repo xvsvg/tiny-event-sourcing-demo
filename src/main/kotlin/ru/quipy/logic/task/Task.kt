@@ -19,16 +19,16 @@ class Task : AggregateState<UUID, TaskAggregate> {
 
     override fun getId() = taskId
 
-    fun changeStatus(status : TaskStatusEntity): TaskStatusChangedEvent {
-        return TaskStatusChangedEvent(status)
+    fun changeStatus(taskId: UUID, projectId : UUID, status : TaskStatusEntity): TaskStatusChangedEvent {
+        return TaskStatusChangedEvent(taskId, projectId, status)
+    }
+
+    fun createTask(name: String, description: String, status: TaskStatusEntity?, projectId : UUID): TaskCreatedEvent {
+        return TaskCreatedEvent(UUID.randomUUID(), name, description, status, projectId);
     }
 
     fun assignExecutors(executors: Collection<UUID>): ExecutorAddedEvent {
-        val uniqueExecutors = HashSet<UUID>()
-        uniqueExecutors.addAll(executors)
-        uniqueExecutors.addAll(this.executors)
-
-        return ExecutorAddedEvent(getId(), uniqueExecutors)
+        return ExecutorAddedEvent(executors)
     }
 
     @StateTransitionFunc
@@ -47,7 +47,11 @@ class Task : AggregateState<UUID, TaskAggregate> {
 
     @StateTransitionFunc
     fun assignExecutorsApply(event: ExecutorAddedEvent) {
-        this.executors = event.executors.toList()
+        val uniqueExecutors = HashSet<UUID>()
+        uniqueExecutors.addAll(event.executors)
+        uniqueExecutors.addAll(executors)
+
+        this.executors = uniqueExecutors.toList()
     }
 }
 

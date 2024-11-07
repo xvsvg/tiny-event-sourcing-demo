@@ -44,8 +44,8 @@ class Project : AggregateState<UUID, ProjectAggregate> {
         return StatusDeletedEvent(status.taskStatusId)
     }
 
-    fun createTask(name: String, description: String, projectId: UUID, status: TaskStatusEntity?): TaskCreatedEvent {
-        return TaskCreatedEvent(UUID.randomUUID(), name, description, status, projectId)
+    fun addTask(taskId : UUID, name: String, description: String, projectId: UUID, status: TaskStatusEntity?): TaskAddedEvent {
+        return TaskAddedEvent(taskId, name, description, status, projectId)
     }
 
     fun create(title: String): ProjectCreatedEvent {
@@ -53,6 +53,10 @@ class Project : AggregateState<UUID, ProjectAggregate> {
             projectId = UUID.randomUUID(),
             title = title
         )
+    }
+
+    fun updateTaskStatus(taskId: UUID, status: TaskStatusEntity?): TaskStatusInProjectUpdatedEvent {
+        return TaskStatusInProjectUpdatedEvent(taskId, status)
     }
 
     @StateTransitionFunc
@@ -97,7 +101,7 @@ class Project : AggregateState<UUID, ProjectAggregate> {
     }
 
     @StateTransitionFunc
-    fun taskCreatedApply(event: TaskCreatedEvent) {
+    fun taskAddedApply(event: TaskAddedEvent) {
         tasks[event.taskId] = TaskEntity(event.taskId, event.taskName, event.description, event.status, event.projectId)
     }
 
@@ -116,5 +120,13 @@ class Project : AggregateState<UUID, ProjectAggregate> {
     @StateTransitionFunc
     fun projectNameChangeApply(event: ProjectNameChangedEvent) {
         projectTitle = event.projectName
+    }
+
+    @StateTransitionFunc
+    fun updateTaskStatusApply(event: TaskStatusInProjectUpdatedEvent){
+        val task = tasks[event.taskId] ?: return
+
+        task.status = event.status
+        tasks[event.taskId] = task
     }
 }
