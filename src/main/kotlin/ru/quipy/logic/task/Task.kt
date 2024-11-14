@@ -11,7 +11,7 @@ import kotlin.collections.HashSet
 
 class Task : AggregateState<UUID, TaskAggregate> {
     lateinit var taskId: UUID
-    lateinit var name: String
+    lateinit var taskName: String
     lateinit var description: String
     var status: TaskStatusEntity? = null
     lateinit var projectId: UUID
@@ -34,7 +34,7 @@ class Task : AggregateState<UUID, TaskAggregate> {
     @StateTransitionFunc
     fun taskCreatedApply(event: TaskCreatedEvent) {
         taskId = event.taskId
-        name = event.taskName
+        taskName = event.taskName
         description = event.description
         status = event.status
         projectId = event.projectId

@@ -7,6 +7,7 @@ import ru.quipy.api.*
 import ru.quipy.api.aggregates.ProjectAggregate
 import ru.quipy.api.aggregates.TaskAggregate
 import ru.quipy.api.aggregates.TaskStatusAggregate
+import ru.quipy.api.aggregates.UserAggregate
 import ru.quipy.controller.models.AddExecutorsModel
 import ru.quipy.controller.models.ChangeStatusModel
 import ru.quipy.controller.models.CreateStatusModel
@@ -15,6 +16,7 @@ import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.project.Project
 import ru.quipy.logic.task.Task
 import ru.quipy.logic.task.TaskStatus
+import ru.quipy.logic.user.User
 import java.util.*
 
 @RestController
@@ -23,6 +25,7 @@ class TaskController(
     val taskStatusEsService: EventSourcingService<UUID, TaskStatusAggregate, TaskStatus>,
     val projectEsService: EventSourcingService<UUID, ProjectAggregate, Project>,
     val taskEsService: EventSourcingService<UUID, TaskAggregate, Task>,
+    val userEsService: EventSourcingService<UUID, UserAggregate, User>
 ) {
 
     @PostMapping("/status")
@@ -78,6 +81,11 @@ class TaskController(
 
     @PostMapping("/{taskId}/add-executors")
     fun addExecutors(@PathVariable taskId : UUID, @RequestBody model : AddExecutorsModel): ExecutorAddedEvent {
+        val user = userEsService.getState(model.executors[0])!!
+        val userProject = projectEsService.getState(user.userId)!!
+        val taskProject = projectEsService.getState(taskId)!!
+        if (taskProject.projectId != userProject.projectId)
+            ResponseEntity("requested status does not belong to tasks' project", HttpStatus.BAD_REQUEST)
         return taskEsService.update(taskId){
             it.assignExecutors(model.executors)
         }

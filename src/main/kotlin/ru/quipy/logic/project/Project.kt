@@ -107,7 +107,7 @@ class Project : AggregateState<UUID, ProjectAggregate> {
 
     @StateTransitionFunc
     fun taskStatusCreatedApply(event: TaskStatusCreatedEvent) {
-        taskStatuses[event.id] = TaskStatusEntity(
+        taskStatuses[event.taskStatusId] = TaskStatusEntity(
             event.taskStatusId,
             event.taskStatusName,
             event.projectId,
