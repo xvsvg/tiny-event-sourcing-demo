@@ -58,6 +58,24 @@
 			<version>${tiny.es.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>1.6.14</version> <!-- Проверьте наличие актуальной версии -->
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.mockk</groupId>
+			<artifactId>mockk</artifactId>
+			<version>1.13.3</version>
+			<scope>test</scope>
+		</dependency>
+
 <!--		<dependency>-->
 <!--			<groupId>ru.quipy</groupId>-->
 <!--			<artifactId>tiny-mongo-event-store-spring-boot-starter</artifactId>-->
