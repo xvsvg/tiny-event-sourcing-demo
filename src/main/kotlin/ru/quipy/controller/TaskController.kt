@@ -17,11 +17,14 @@ import ru.quipy.logic.project.Project
 import ru.quipy.logic.task.Task
 import ru.quipy.logic.task.TaskStatus
 import ru.quipy.logic.user.User
+import ru.quipy.projections.TaskProjection
+import ru.quipy.projections.TaskProjectionRepository
 import java.util.*
 
 @RestController
 @RequestMapping("/tasks")
 class TaskController(
+    val taskProjectionRepository: TaskProjectionRepository,
     val taskStatusEsService: EventSourcingService<UUID, TaskStatusAggregate, TaskStatus>,
     val projectEsService: EventSourcingService<UUID, ProjectAggregate, Project>,
     val taskEsService: EventSourcingService<UUID, TaskAggregate, Task>,
@@ -88,6 +91,26 @@ class TaskController(
             ResponseEntity("requested status does not belong to tasks' project", HttpStatus.BAD_REQUEST)
         return taskEsService.update(taskId){
             it.assignExecutors(model.executors)
+        }
+    }
+
+    @GetMapping("/project/{projectId}")
+    fun getTasksByProjectId(@PathVariable projectId: UUID): ResponseEntity<List<TaskProjection>> {
+        val tasks = taskProjectionRepository.findByProjectId(projectId)
+        return if (tasks.isNotEmpty()) {
+            ResponseEntity.ok(tasks)
+        } else {
+            ResponseEntity.notFound().build()
+        }
+    }
+
+    @GetMapping
+    fun getTaskByName(@RequestParam taskName: String): ResponseEntity<List<TaskProjection>> {
+        val tasks = taskProjectionRepository.findByTaskName(taskName)
+        return if (tasks.isNotEmpty()) {
+            ResponseEntity.ok(tasks)
+        } else {
+            ResponseEntity.notFound().build()
         }
     }
 }

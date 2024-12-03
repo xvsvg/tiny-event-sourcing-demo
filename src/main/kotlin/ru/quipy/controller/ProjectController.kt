@@ -12,11 +12,14 @@ import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.project.Project
 import ru.quipy.logic.task.TaskStatus
 import ru.quipy.logic.user.User
+import ru.quipy.projections.ProjectProjection
+import ru.quipy.projections.ProjectProjectionRepository
 import java.util.*
 
 @RestController
 @RequestMapping("/projects")
 class ProjectController(
+    val projectProjectionRepository: ProjectProjectionRepository,
     val projectEsService: EventSourcingService<UUID, ProjectAggregate, Project>,
     val userEsService: EventSourcingService<UUID, UserAggregate, User>,
     val taskStatusEsService: EventSourcingService<UUID, TaskStatusAggregate, TaskStatus>
@@ -66,6 +69,27 @@ class ProjectController(
     fun changeProjectName(@PathVariable projectId: UUID, @PathVariable name: String): ProjectNameChangedEvent {
         return projectEsService.update(projectId){
             it.changeProjectName(name)
+        }
+    }
+
+    @GetMapping("/{projectId}")
+    fun getProjectByID(@PathVariable projectId: UUID): ResponseEntity<ProjectProjection> {
+        val project = projectProjectionRepository.findById(projectId)
+        return if (project.isPresent) {
+            ResponseEntity.ok(project.get())
+        } else {
+            ResponseEntity.notFound().build()
+        }
+    }
+
+    @GetMapping("/user/{userId}")
+    fun getProjectsByUserId(@PathVariable userId: UUID): ResponseEntity<List<ProjectProjection>> {
+        // Assuming you have a way to find projects by userId
+        val projects = projectProjectionRepository.findByUserId(userId)
+        return if (projects.isNotEmpty()) {
+            ResponseEntity.ok(projects)
+        } else {
+            ResponseEntity.notFound().build()
         }
     }
 }

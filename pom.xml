@@ -15,7 +15,7 @@
 	<description>Demo project for Tiny Event Sourcing lib</description>
 	<properties>
 		<java.version>11</java.version>
-		<kotlin.version>1.6.21</kotlin.version>
+		<kotlin.version>1.9.0</kotlin.version>
 		<tiny.es.version>2.7.4</tiny.es.version>
 	</properties>
 	<dependencies>
@@ -74,6 +74,16 @@
 			<artifactId>mockk</artifactId>
 			<version>1.13.3</version>
 			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate.orm</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>6.2.9.Final</version>
 		</dependency>
 
 <!--		<dependency>-->
