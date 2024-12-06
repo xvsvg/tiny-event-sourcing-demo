@@ -14,15 +14,16 @@ class TaskStatus : AggregateState<UUID, TaskStatusAggregate> {
     var rColor: Int = 0
     var gColor: Int = 0
     var bColor: Int = 0
+    var priority: Int = 0
 
     override fun getId() = taskStatusId
 
-    fun create(name: String, projectId: UUID, rColor: Int = 0, gColor: Int = 0, bColor: Int = 0): TaskStatusCreatedEvent {
+    fun create(name: String, projectId: UUID, rColor: Int = 0, gColor: Int = 0, bColor: Int = 0, priority: Int = 0): TaskStatusCreatedEvent {
         if (name.isBlank()) {
             throw IllegalArgumentException("Status name should not be blank")
         }
 
-        return TaskStatusCreatedEvent(UUID.randomUUID(), name, projectId, rColor, gColor, bColor)
+        return TaskStatusCreatedEvent(UUID.randomUUID(), name, projectId, rColor, gColor, bColor, priority)
     }
 
     @StateTransitionFunc
@@ -33,6 +34,7 @@ class TaskStatus : AggregateState<UUID, TaskStatusAggregate> {
         rColor = event.rColor
         gColor = event.gColor
         bColor = event.bColor
+        priority = event.priority
     }
 }
 
@@ -42,5 +44,6 @@ data class TaskStatusEntity(
     var projectId: UUID,
     var rColor: Int = 0,
     var gColor: Int = 0,
-    var bColor: Int = 0
+    var bColor: Int = 0,
+    var priority: Int = 0
 )
